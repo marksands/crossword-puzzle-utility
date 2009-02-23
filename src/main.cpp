@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+
 #include "BST.h"
 #include "AVL.h"
 #include "SearchableADT.h"
@@ -48,13 +49,13 @@ int main( int argc, char* argv[] )
 	do {
 		switch ( choice = InitMenu() ) {
 			case BST_TREE:
-				dictionary = new bst::BST<string>;
+				dictionary = new BST<string>;
 				break;
 			case AVL_TREE:
-				dictionary = new avl::AVL<string>;
+				dictionary = new AVL<string>;
 				break;
 			default:
-			;//	dictionary = new AVL<string>;
+			dictionary = new AVL<string>;
 		}
 	} while( choice == 0);
 	

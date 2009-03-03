@@ -7,10 +7,9 @@
 #include "SearchableADT.h"
 
 using namespace std;
-
-namespace bst
-{	
+	
 	template<class T> class BST;
+	template<class T> class AVL;
 	
 	//---------------------------------------------------------------------------------------------------
 	// Class: TreeNode
@@ -20,8 +19,10 @@ namespace bst
 	{
 	private:
 		friend class BST<T>;
+		friend class AVL<T>;
 
 		T item;
+		int height;
 		TreeNode<T>* left;
 		TreeNode<T>* right;
 
@@ -30,11 +31,22 @@ namespace bst
 			// Sets the fields to the supplied parameters.
 	};
 
+
+	//---------------------------------------------------------------------------------------------------
+	// Class: TreeNode
+	//---------------------------------------------------------------------------------------------------
+
+		template <class T>
+		TreeNode<T>::TreeNode(const T& item, TreeNode<T>* left, TreeNode<T>* right)
+			: item(item), left(left), right(right), height(0)
+		{ }
+		
+				
 	//---------------------------------------------------------------------------------------------------
 	// Class: BST
 	//---------------------------------------------------------------------------------------------------
 	template<class T>
-	class BST : public ::SearchableADT<T>
+	class BST : public SearchableADT<T>
 	{
 	private:
 		TreeNode<T>* root;
@@ -52,12 +64,6 @@ namespace bst
 			// Once found calls RemoveNode to remove it.
 		virtual void ProcessLeftMost(TreeNode<T>*& pTree, T& replacementItem);
 			// Finds the left most node on the right subtree to replace the node to be removed.
-		void Preorder(TreeNode<T>* pTree, void(*visit)(const T& item));
-			// Performs a preorder traversal and executes the function visit upon root visitation.
-		void Inorder(TreeNode<T>* pTree, void(*visit)(const T& item));
-			// Performs an inorder traversal and executes the function visit upon root visitation.
-		void Postorder(TreeNode<T>* pTree, void(*visit)(const T& item));
-			// Performs a postorder traversal and executes the function visit upon root visitation.
 		void DestroyTree(TreeNode<T>*& pTree);
 			// Destroys the bst tree.
 		void CopyTree(TreeNode<T>* pFromTree, TreeNode<T>*& pToTree);
@@ -72,18 +78,12 @@ namespace bst
 			// Calls CopyTree() to make a copy of the current tree.
 		virtual ~BST();
 			// Calls DestroyTree() to destroy the current tree.
-		void PreorderTraversal(  void (*visit)(const T& item) );
-			// Calls Preorder() to perform a preorder traversal of the tree.
-		void InorderTraversal(   void (*visit)(const T& item) );
-			// Calls Inorder() to perform an inorder traversal of the tree.
-		void PostorderTraversal( void (*visit)(const T& item) );
-			// Calls Postorder() to perform a postorder traversal of the tree.
-				
+
 		int LoadFromFile(string filename);
 			// loads from file
 		void clear(void);
 			// clears tree
-		virtual void insertEntry(T value);
+		void insertEntry(T value);
 			// inserts entry 'value'
 		void deleteEntry(T value);
 			// deletes entry 'value'
@@ -93,14 +93,6 @@ namespace bst
 			// number of entries
 	};
 	
-			//---------------------------------------------------------------------------------------------------
-			// Class: TreeNode
-			//---------------------------------------------------------------------------------------------------
-
-				template <class T>
-				TreeNode<T>::TreeNode(const T& item, TreeNode<T>* left, TreeNode<T>* right)
-					: item(item), left(left), right(right)
-				{ }
 
 			//---------------------------------------------------------------------------------------------------
 			// Class: BST
@@ -186,43 +178,6 @@ namespace bst
 
 				}
 
-				template <class T>
-				void BST<T>::Preorder(TreeNode<T>* pTree, void(*visit)(const T& item))
-				{
-					visit(pTree->item);
-
-					if ( pTree->left != NULL )
-						Preorder(pTree->left, visit);
-
-					if ( pTree->right != NULL )
-						Preorder(pTree->right, visit);
-				}
-
-				template <class T>
-				void BST<T>::Inorder(TreeNode<T>* pTree, void(*visit)(const T& item))
-				{
-					if ( pTree->left != NULL )
-						Inorder(pTree->left, visit);
-
-					visit(pTree->item);
-
-					if ( pTree->right != NULL )
-						Inorder(pTree->right, visit);
-				}
-
-
-				template <class T>
-				void BST<T>::Postorder(TreeNode<T>* pTree, void(*visit)(const T& item))
-				{
-					if ( pTree->left != NULL )
-						Postorder(pTree->left, visit);
-
-					if ( pTree->right != NULL )
-						Postorder(pTree->right, visit);
-
-					visit(pTree->item);
-				}
-
 
 				template <class T>
 				void BST<T>::DestroyTree(TreeNode<T>*& pTree)
@@ -295,25 +250,6 @@ namespace bst
 				}
 
 
-				template <class T>
-				void BST<T>::PreorderTraversal(void(*visit)(const T& item))
-				{
-					Preorder(root, visit);
-				}
-
-				template <class T>
-				void BST<T>::InorderTraversal( void (*visit)(const T& item) )
-				{
-					Inorder(root, visit);
-				}
-
-				template <class T>
-				void BST<T>::PostorderTraversal( void (*visit)(const T& item) )
-				{
-					Postorder(root, visit);
-				}
-
-
 			//***********************************
 			//	
 			// 		Inherited Methods
@@ -375,7 +311,6 @@ namespace bst
 					return ( nodeCount );
 				}
 	
-}
 
 //#include "BST.cpp"
 

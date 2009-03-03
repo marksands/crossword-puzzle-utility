@@ -8,34 +8,11 @@
 
 using namespace std;
 
-namespace avl
-{	
-	template<class T> class AVL;
-	
-	//---------------------------------------------------------------------------------------------------
-	// Class: TreeNode
-	//---------------------------------------------------------------------------------------------------
-	template<class T>
-	class TreeNode
-	{
-	private:
-		friend class AVL<T>;
-
-		T item;
-		int balance;
-		TreeNode<T>* left;
-		TreeNode<T>* right;
-
-	public:
-		TreeNode<T>(const T& item, TreeNode<T>* left, TreeNode<T>* right);
-			// Sets the fields to the supplied parameters.
-	};
-
 	//---------------------------------------------------------------------------------------------------
 	// Class: AVL
 	//---------------------------------------------------------------------------------------------------
 	template<class T>
-  class AVL : public ::bst::BST<T>
+	class AVL : public BST<T>
 	{
 	private:
 		TreeNode<T>* root;
@@ -44,7 +21,7 @@ namespace avl
 			// keeps a running count of the number of nodes
 
 	protected:
-		TreeNode<T>* InsertNode(TreeNode<T>*& pTree, const T& item);
+		void InsertNode(TreeNode<T>*& pTree, const T& item);
 			// Inserts the item into the tree.
 		void RemoveNode(TreeNode<T>*& pTree);
 			// Removes the actual node from the tree.
@@ -61,19 +38,18 @@ namespace avl
 			// returns true if the item is found in the tree, false otherwise
 			
 				
-		TreeNode<T>* SingleRightRotation( TreeNode<T>*& pTree );
+		void SingleRightRotation( TreeNode<T>*& pTree );
 			// performs a single right rotation on the tree
-		TreeNode<T>* SingleLeftRotation( TreeNode<T>*& pTree );
+		void SingleLeftRotation( TreeNode<T>*& pTree );
 			// performs a single left rotation on the tree
-		TreeNode<T>* DoubleRightLeftRotation( TreeNode<T>*& pTree );
+		void DoubleRightLeftRotation( TreeNode<T>*& pTree );
 			// performs a double right left rotation on the tree
-		TreeNode<T>* DoubleLeftRightRotation( TreeNode<T>*& pTree );
+		void DoubleLeftRightRotation( TreeNode<T>*& pTree );
 			// performs a double left right rotation on the tree
 			
 		int Height( TreeNode<T>*& pTree );
 			// returns the balance of the tree, if NULL returns -1
             
-
 	public:
 		AVL();
 			// Sets the root to NULL;
@@ -81,77 +57,52 @@ namespace avl
 			// Calls CopyTree() to make a copy of the current tree.
 		~AVL();
 			// Calls DestroyTree() to destroy the current tree.
-			
-		//virtual int LoadFromFile(string filename);
-			// loads from file
-		//virtual void clear(void);
-			// clears tree
-		virtual void insertEntry(T value);
-			// inserts entry 'value'
-		//virtual void deleteEntry(T value);
-			// deletes entry 'value'
-		//virtual bool isThere(T value);
-			// boolean is there?
-		//virtual int numEntries(void);	
-			// number of entries
 	};
-	
-	
-		//---------------------------------------------------------------------------------------------------
-		// Class: TreeNode
-		//---------------------------------------------------------------------------------------------------
-
-			template <class T>
-			TreeNode<T>::TreeNode(const T& item, TreeNode<T>* left, TreeNode<T>* right)
-				: item(item), left(left), right(right), balance(0)
-			{ }
 
 		//---------------------------------------------------------------------------------------------------
 		// Class: AVL
 		//---------------------------------------------------------------------------------------------------
 
 			template <class T>
-			TreeNode<T>* AVL<T>::InsertNode(TreeNode<T>*& pTree, const T& item)
+			void AVL<T>::InsertNode(TreeNode<T>*& pTree, const T& item)
 			{
-				if ( item < pTree->item ) {
-
-						pTree->left = InsertNode( pTree->left , item );
-
-		        int balance = Height( pTree->left ) - Height( pTree->right );
-
-		        if ( balance == 2 ) {
-							if ( item < pTree->left->item )
-								pTree = SingleRightRotation( pTree );
-							else
-								pTree = DoubleLeftRightRotation( pTree );
-		        }
-		    }
-				else if ( item >= pTree->item ) {
-
-		                pTree->right = InsertNode( pTree->right, item );
-
-		                int balance = Height( pTree->right ) - Height( pTree->left );
-
-		                if ( balance == 2 ) {
-							if ( item >= pTree->right->item )
-								pTree = SingleLeftRotation( pTree );
-							else
-								pTree = DoubleRightLeftRotation( pTree );
-		                }
-		        }
-				else {
-
-						pTree = new TreeNode<T>( item, NULL, NULL );
-						nodeCount++;
+				if ( pTree == NULL )
+				{
+					pTree = new TreeNode<T>( item, NULL, NULL );
+					nodeCount++;
 				}
+				else if ( item < pTree->item ) {
+
+					InsertNode( pTree->left , item );
+
+					int balance = Height( pTree->left ) - Height( pTree->right );
+					if ( balance == 2 ) {
+						if ( item < pTree->left->item )
+							SingleRightRotation( pTree );
+						else
+							//DoubleLeftRightRotation( pTree );
+							DoubleRightLeftRotation( pTree );
+					}
+				}
+				else if ( item > pTree->item ) {
+					
+					InsertNode( pTree->right, item );
+
+					int balance = Height( pTree->right ) - Height( pTree->left );
+					if ( balance == 2 ) {
+						if ( item > pTree->right->item )
+							SingleLeftRotation( pTree );
+						else
+							DoubleLeftRightRotation( pTree );
+							//DoubleRightLeftRotation( pTree );
+					}
+		        }
 
 
-		    int height = Height( pTree->left ) >= Height( pTree->right ) ?
+				int height = Height( pTree->left ) >= Height( pTree->right ) ?
 											Height( pTree->left ) : Height( pTree->right );
-		    pTree->balance = height + 1;
 
-				return pTree;
-
+				pTree->height = height + 1;
 			}
 
 
@@ -233,7 +184,7 @@ namespace avl
 
 
 			template <class T>
-			TreeNode<T>* AVL<T>::SingleRightRotation( TreeNode<T>*& pTree)
+			void AVL<T>::SingleRightRotation( TreeNode<T>*& pTree)
 			{
 				TreeNode<T>* temp = NULL;
 
@@ -241,68 +192,61 @@ namespace avl
 			    {
 			        temp = pTree->left;
 			        pTree->left = temp->right;
-			        pTree->right = pTree;
+			        pTree->right = temp;
 
-			        int balance =  Height( pTree->left ) >= Height( pTree->right ) ?
+			        int height =  Height( pTree->left ) >= Height( pTree->right ) ?
 									Height( pTree->left ) : Height( pTree->right);
-			        pTree->balance = balance + 1;
+			        pTree->height = height + 1;
 
-					balance = Height( temp->left ) >= Height( pTree ) ?
+					height = Height( temp->left ) >= Height( pTree ) ?
 							   Height( temp->left ) : Height( pTree );
-			        temp->balance = balance + 1;
-				}
+			        temp->height = height + 1;
 
-				return temp;
+					pTree = temp;
+				}
 			}
 
 			template <class T>		
-	        TreeNode<T>* AVL<T>::SingleLeftRotation( TreeNode<T>*& pTree)
+	        void AVL<T>::SingleLeftRotation( TreeNode<T>*& pTree)
 			{
 				TreeNode<T>* temp = NULL;
 
 				if ( pTree != NULL )
 				{
-							temp = pTree->right;
+					temp = pTree->right;
 			        pTree->right = temp->left;
 			        pTree->left = temp;
 
-			        int balance = Height( pTree->left ) >= Height( pTree->right ) ?
+			        int height = Height( pTree->left ) >= Height( pTree->right ) ?
 									Height( pTree->left ) : Height( pTree->right );
-			        pTree->balance = balance + 1;
+			        pTree->height = height + 1;
 
-			        balance = Height( temp->right ) >= Height( pTree ) ?
+			        height = Height( temp->right ) >= Height( pTree ) ?
 								Height( temp->right ) : Height( pTree );
-			        temp->balance = balance + 1;
-
+			        temp->height = height + 1;
+					
+					pTree = temp;
 				}
-
-				return temp;
 			}
 
 			template <class T>
-	        TreeNode<T>* AVL<T>::DoubleRightLeftRotation( TreeNode<T>*& pTree)
+	        void AVL<T>::DoubleRightLeftRotation( TreeNode<T>*& pTree)
 			{
-				TreeNode<T>* temp = NULL;
-				if ( pTree == NULL )
+				if ( pTree != NULL )
 				{
-			        pTree->right = SingleRightRotation( pTree->right );
-					temp = SingleLeftRotation( pTree );
-				 }
-
-				return temp;   
+			        SingleLeftRotation( pTree->right );
+					SingleRightRotation( pTree );
+				} 
 			}
 
 			template <class T>
-	        TreeNode<T>* AVL<T>::DoubleLeftRightRotation( TreeNode<T>*& pTree)
+	        void AVL<T>::DoubleLeftRightRotation( TreeNode<T>*& pTree)
 			{
-				TreeNode<T>* temp = NULL;
-				if ( pTree == NULL )
+				if ( pTree != NULL )
 				{
-			        pTree->left = SingleLeftRotation( pTree->left );
-					temp = SingleRightRotation( pTree );
-				 }
-
-				return temp;	
+			        SingleRightRotation( pTree->left );
+					SingleLeftRotation( pTree );
+				}
 			}
 
 
@@ -312,7 +256,7 @@ namespace avl
 				int height = -1;
 
 				if ( pTree != NULL ) {
-					height = pTree->balance;
+					height = pTree->height;
 				}
 
 				return ( height );
@@ -327,7 +271,7 @@ namespace avl
 
 
 			template <class T>
-			AVL<T>::AVL() : root(NULL)
+			AVL<T>::AVL() : BST(), root(NULL), nodeCount(0)
 			{ }
 
 
@@ -354,14 +298,21 @@ namespace avl
 		//
 		//***********************************
 
-
+			/*
 			template <class T>
 			void AVL<T>::insertEntry(T value)
 			{
-				root = InsertNode(root, value);
+				InsertNode(root, value);
 			}
 
-}
+			template <class T>
+			int AVL<T>::numEntries(void)
+			{
+				return ( nodeCount );
+			}
+			*/
+
+
 
 //#include "AVL.cpp"
 

@@ -12,13 +12,11 @@
 #include <iomanip>
 #include <string>
 
+#include "SearchableADT.h"
 #include "BST.h"
 #include "AVL.h"
-#include "SearchableADT.h"
 
 
-using namespace bst;
-using namespace avl;
 using namespace std;
 
 enum MenuOptions {LOAD = 1, CLEAR = 2, CHECK_ENTRY = 3, CHECK_FROM_FILE = 4, STATS = 5, QUIT = 6};

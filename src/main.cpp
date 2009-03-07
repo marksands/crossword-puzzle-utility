@@ -2,9 +2,13 @@
 //   Name: Mark Sands
 //   Date: 3/02/08
 // Course: CS 340 - Data Structures and Algorithms
-//   Desc: 
+//   Desc: a SearchableADT class that creats a dictionary object inheriting either
+//			a BST or an AVL tree which loads in dictionary files. Then the user is
+//			able to search the tree for a partial word using '?' as a wildcard letter
 //
-//         Other files required: BST.h, AVL.h, SearchableADT.h 
+//  Other files required: BST.h, AVL.h, SearchableADT.h 
+//
+//	* citations: Justin Camerer for the amazing Timer class idea
 //------------------------------------------------------------------------------------------
 
 #include <ctime>
@@ -15,14 +19,13 @@
 #include "SearchableADT.h"
 #include "BST.h"
 #include "AVL.h"
+#include "Timer.h"
 
 
 using namespace std;
 
 enum MenuOptions {LOAD = 1, CLEAR = 2, CHECK_ENTRY = 3, CHECK_FROM_FILE = 4, STATS = 5, QUIT = 6};
 enum InitMenuOptions { BST_TREE = 1, AVL_TREE =  2};
-
-void Display(const string& item);
 
 int InitMenu();
 int Menu();
@@ -33,6 +36,8 @@ void CheckEntry( SearchableADT<string>*& dictionary );
 void CheckEntryFromFile( SearchableADT<string>*& dictionary );
 void ShowStats( SearchableADT<string>*& dictionary );
 
+void SearchForWord( SearchableADT<string>*& dictionary, string word );
+void SearchForWord( SearchableADT<string>*& dictionary, string word, int pos  );
 
 int main( int argc, char* argv[] )
 {
@@ -98,12 +103,6 @@ int main( int argc, char* argv[] )
 
 
 
-void Display(const string& item)
-{
-	cout << item << endl;
-}
-
-
 int InitMenu()
 {
 	int choice;
@@ -149,7 +148,7 @@ int Menu()
 
 void ReadFile( SearchableADT<string>*& dictionary )
 {
-	clock_t finish, start = clock();
+	Timer t;
 	
 	string filename;
 	cout << setw(3) <<  " " << "Enter filename: ";
@@ -157,31 +156,21 @@ void ReadFile( SearchableADT<string>*& dictionary )
 	
 	if ( !dictionary->LoadFromFile(filename) )
 		cerr << setw(3) << " " << "File failed to load!" << endl;
-		
-	finish = clock();
-	cout << setw(5) << " " << "Total time: "
-		 << ( (double) (finish - start)/CLOCKS_PER_SEC )
-		 << endl;
 }
 	
 
 void Clear( SearchableADT<string>*& dictionary )
 {
-	clock_t finish, start = clock();
+	Timer t;
 	
 	dictionary->clear();
 	cout << setw(3) << " " << "Tree cleared." << endl;
-	
-	finish = clock();
-	cout << setw(5) << " " << "Total time: "
-		 << ( (double) (finish - start)/CLOCKS_PER_SEC )
-		 << endl;
 }
 
 void CheckEntry( SearchableADT<string>*& dictionary )
 {
-	clock_t finish, start = clock();
-	
+	Timer t;
+
 	string pattern;
 	cout << setw(3) << " " << "Enter a word or pattern. Use '?' for wilcard: ";
 	cin >> pattern;
@@ -190,53 +179,96 @@ void CheckEntry( SearchableADT<string>*& dictionary )
 		 << setw(3)  << " "
 		 << "Words:" << endl;
 
-	int pos = 0;
-	string temp = pattern;
+	//SearchForWord( dictionary, pattern );
+	SearchForWord( dictionary, pattern, 0 );
+
+	cout << endl;
+}
+
+void CheckEntryFromFile( SearchableADT<string>*& dictionary )
+{
+	Timer t;
+
+	string filename, word;
+	cout << setw(3) << " " << "Enter filename: ";
+	cin >> filename;
+
+	ifstream fin( filename.c_str() );
+	if ( fin.fail() ) {
+		cerr << "File failed to load!" << endl;
+		return;
+	}
+	else {
+		while ( !fin.eof() ) {
+			fin >> word;
+			SearchForWord( dictionary, word );
+		}
+	}
+}
+
+void ShowStats( SearchableADT<string>*& dictionary )
+{
+	Timer t;
+		
+	cout << setw(3) << " " << "Number of entries: "
+		 << dictionary->numEntries() << endl;
+	
+	cout << setw(3) << " " << "Tree height: "
+		 << dictionary->treeHeight() << endl;
+}
+
+
+void SearchForWord( SearchableADT<string>*& dictionary, string word )
+{
+	int pos = -1;
+	string temp = word;
 	// find the position of the wildcard
 	for ( size_t j = 0; j < temp.size(); j++ ) {
 		if ( temp[j] == '?' ) pos = j;
 	}
 
 	// check every value for the pattern
-	for ( int i = 0; i < 26; i++ ) {
-		temp[pos] = i + 97;
-		if ( dictionary->isThere( temp ) ) {
-			cout << setw(5) << " " << temp << endl;
+	if ( pos > -1 ) {
+		for ( int i = 0; i < 26; i++ ) {
+			temp[pos] = i + 97;
+			if ( dictionary->isThere( temp ) ) {
+				cout << setw(5) << " " << temp << endl;
+			}
 		}
 	}
-
-	cout << endl;
-
-	finish = clock();
-	cout << setw(5) << " " << "Total time: "
-		 << ( (double) (finish - start)/CLOCKS_PER_SEC )
-		 << endl;
+	else if ( dictionary->isThere( temp ) ) {
+		cout << setw(5) << " "
+			 << "Word: " << temp << " was found in the file. "
+			 << endl;
+	}
+	else {
+		cout << setw(3) << " "
+			 << "Word appears to be mispelled."
+			 << endl;
+	}
 }
 
-void CheckEntryFromFile( SearchableADT<string>*& dictionary )
+
+void SearchForWord( SearchableADT<string>*& dictionary, string word, int pos )
 {
-	clock_t finish, start = clock();
+	string temp = word;
+	int qpos = -1;
 	
-	string filename;
-	cout << setw(3) << " " << "Enter filename: ";
-	cin >> filename;
-	
-	// search file
-	finish = clock();
-	cout << setw(5) << " " << "Total time: "
-		 << ( (double) (finish - start)/CLOCKS_PER_SEC )
-		 << endl;
+	for ( size_t i = pos; i < temp.size(); i++ )
+	{
+		if ( temp[i] == '?' )
+		{
+			qpos = i;
+			for ( int i = 0; i < 26; i++ )
+			{
+				temp[qpos] = i + 97;
+				SearchForWord( dictionary, temp, qpos );
+				
+				if ( dictionary->isThere( temp ) ) {
+					cout << setw(5) << " " << temp << endl;
+				}
+			}
+		}		
+	}
 }
 
-void ShowStats( SearchableADT<string>*& dictionary )
-{
-	clock_t finish, start = clock();
-		
-	cout << setw(3) << " " << "Number of entries: "
-		 << dictionary->numEntries() << endl;
-		
-	finish = clock();
-	cout << setw(5) << " " << "Total time: "
-		 << ( (double) (finish - start)/CLOCKS_PER_SEC )
-		 << endl;
-}

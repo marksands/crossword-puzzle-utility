@@ -5,5 +5,3 @@
 	<p style="text-align:left;">If the word is not found in the tree, then the word is declared as &#8220;misspelled.&#8221;  A query can be made upon either the existing data structure, or through a given file.</p>
 
 	<p style="text-align:left;">This program is to demonstrate the speed difference between a BST load/search and an AVL load/search.  The BST is significantly slower than the AVL, and the program outputs the amount of time it takes per method.</p>
-
-	<p style="text-align:left;">Mad thanks to whoever figures out why this won't compile :(!!</P>

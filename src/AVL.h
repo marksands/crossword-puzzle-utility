@@ -30,14 +30,7 @@ using namespace std;
 			// Once found calls RemoveNode to remove it.
 		void ProcessLeftMost(TreeNode<T>*& pTree, T& replacementItem);
 			// Finds the left most node on the right subtree to replace the node to be removed.
-		void DestroyTree(TreeNode<T>*& pTree);
-			// Destroys the AVL tree.
-		void CopyTree(TreeNode<T>* pFromTree, TreeNode<T>*& pToTree);
-			// Performs a preorder copy of the current tree to create a new one.
-		bool isThere(TreeNode<T>* pTree, const T& item);
-			// returns true if the item is found in the tree, false otherwise
-			
-				
+
 		void SingleRightRotation( TreeNode<T>*& pTree );
 			// performs a single right rotation on the tree
 		void SingleLeftRotation( TreeNode<T>*& pTree );
@@ -49,6 +42,8 @@ using namespace std;
 			
 		int Height( TreeNode<T>*& pTree );
 			// returns the balance of the tree, if NULL returns -1
+		int numEntries(void);	
+			// number of entries
             
 	public:
 		AVL();
@@ -80,7 +75,6 @@ using namespace std;
 						if ( item < pTree->left->item )
 							SingleRightRotation( pTree );
 						else
-							//DoubleLeftRightRotation( pTree );
 							DoubleRightLeftRotation( pTree );
 					}
 				}
@@ -94,7 +88,6 @@ using namespace std;
 							SingleLeftRotation( pTree );
 						else
 							DoubleLeftRightRotation( pTree );
-							//DoubleRightLeftRotation( pTree );
 					}
 		        }
 
@@ -106,6 +99,72 @@ using namespace std;
 			}
 
 
+
+			template <class T>
+			void AVL<T>::SingleRightRotation( TreeNode<T>*& pTree)
+			{
+				TreeNode<T>* temp = NULL;
+
+				if (pTree != NULL)
+			    {
+			        temp = pTree->left;
+			        pTree->left = temp->right;
+					temp->right = pTree;
+
+			        int height =  Height( pTree->left ) >= Height( pTree->right ) ?
+									Height( pTree->left ) : Height( pTree->right);
+			        pTree->height = height + 1;
+
+					height = Height( temp->left ) >= Height( pTree ) ?
+							   Height( temp->left ) : Height( pTree );
+			        temp->height = height + 1;
+
+					pTree = temp;
+				}
+			}
+
+			template <class T>		
+	        void AVL<T>::SingleLeftRotation( TreeNode<T>*& pTree)
+			{
+				TreeNode<T>* temp = NULL;
+
+				if ( pTree != NULL )
+				{
+					temp = pTree->right;
+			        pTree->right = temp->left;
+					temp->left = pTree;
+
+			        int height = Height( pTree->left ) >= Height( pTree->right ) ?
+									Height( pTree->left ) : Height( pTree->right );
+			        pTree->height = height + 1;
+
+			        height = Height( temp->right ) >= Height( pTree ) ?
+								Height( temp->right ) : Height( pTree );
+			        temp->height = height + 1;
+					
+					pTree = temp;
+				}
+			}
+
+			template <class T>
+	        void AVL<T>::DoubleRightLeftRotation( TreeNode<T>*& pTree)
+			{
+				if ( pTree != NULL )
+				{
+			        SingleLeftRotation( pTree->left );
+					SingleRightRotation( pTree );
+				} 
+			}
+
+			template <class T>
+	        void AVL<T>::DoubleLeftRightRotation( TreeNode<T>*& pTree)
+			{
+				if ( pTree != NULL )
+				{
+			        SingleRightRotation( pTree->right );
+					SingleLeftRotation( pTree );
+				}
+			}
 
 
 			template <class T>
@@ -153,7 +212,6 @@ using namespace std;
 					pTree->item = replacementItem;
 				}
 			}
-			
 
 			template <class T>
 			void AVL<T>::ProcessLeftMost(TreeNode<T>*& pTree, T& replacementItem)
@@ -176,90 +234,15 @@ using namespace std;
 
 
 			template <class T>
-			void AVL<T>::DestroyTree(TreeNode<T>*& pTree)
-			{
-				while ( pTree != NULL )
-					RemoveNode(pTree);
-			}
-
-
-			template <class T>
-			void AVL<T>::SingleRightRotation( TreeNode<T>*& pTree)
-			{
-				TreeNode<T>* temp = NULL;
-
-				if (pTree != NULL)
-			    {
-			        temp = pTree->left;
-			        pTree->left = temp->right;
-			        pTree->right = temp;
-
-			        int height =  Height( pTree->left ) >= Height( pTree->right ) ?
-									Height( pTree->left ) : Height( pTree->right);
-			        pTree->height = height + 1;
-
-					height = Height( temp->left ) >= Height( pTree ) ?
-							   Height( temp->left ) : Height( pTree );
-			        temp->height = height + 1;
-
-					pTree = temp;
-				}
-			}
-
-			template <class T>		
-	        void AVL<T>::SingleLeftRotation( TreeNode<T>*& pTree)
-			{
-				TreeNode<T>* temp = NULL;
-
-				if ( pTree != NULL )
-				{
-					temp = pTree->right;
-			        pTree->right = temp->left;
-			        pTree->left = temp;
-
-			        int height = Height( pTree->left ) >= Height( pTree->right ) ?
-									Height( pTree->left ) : Height( pTree->right );
-			        pTree->height = height + 1;
-
-			        height = Height( temp->right ) >= Height( pTree ) ?
-								Height( temp->right ) : Height( pTree );
-			        temp->height = height + 1;
-					
-					pTree = temp;
-				}
-			}
-
-			template <class T>
-	        void AVL<T>::DoubleRightLeftRotation( TreeNode<T>*& pTree)
-			{
-				if ( pTree != NULL )
-				{
-			        SingleLeftRotation( pTree->right );
-					SingleRightRotation( pTree );
-				} 
-			}
-
-			template <class T>
-	        void AVL<T>::DoubleLeftRightRotation( TreeNode<T>*& pTree)
-			{
-				if ( pTree != NULL )
-				{
-			        SingleRightRotation( pTree->left );
-					SingleLeftRotation( pTree );
-				}
-			}
-
-
-			template <class T>
 			int AVL<T>::Height( TreeNode<T>*& pTree )
 			{
-				int height = -1;
-
-				if ( pTree != NULL ) {
-					height = pTree->height;
-				}
-
-				return ( height );
+				return ( pTree == NULL ? -1 : pTree->height );
+			}
+			
+			template <class T>
+			int AVL<T>::numEntries(void)
+			{
+				return ( nodeCount );
 			}
 
 
@@ -271,7 +254,7 @@ using namespace std;
 
 
 			template <class T>
-			AVL<T>::AVL() : BST(), root(NULL), nodeCount(0)
+			AVL<T>::AVL() : root(NULL), nodeCount(0)
 			{ }
 
 
@@ -288,31 +271,6 @@ using namespace std;
 			{
 				DestroyTree(root);
 			}
-
-
-
-
-		//***********************************
-		//	
-		// 		Inherited Methods
-		//
-		//***********************************
-
-			/*
-			template <class T>
-			void AVL<T>::insertEntry(T value)
-			{
-				InsertNode(root, value);
-			}
-
-			template <class T>
-			int AVL<T>::numEntries(void)
-			{
-				return ( nodeCount );
-			}
-			*/
-
-
 
 //#include "AVL.cpp"
 

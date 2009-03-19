@@ -30,6 +30,8 @@ enum InitMenuOptions { BST_TREE = 1, AVL_TREE =  2};
 int InitMenu();
 int Menu();
 
+void GetDS( SearchableADT<string>*& dictionary );
+
 void ReadFile( SearchableADT<string>*& dictionary );
 void Clear( SearchableADT<string>*& dictionary );
 void CheckEntry( SearchableADT<string>*& dictionary );
@@ -39,65 +41,25 @@ void ShowStats( SearchableADT<string>*& dictionary );
 void SearchForWord( SearchableADT<string>*& dictionary, string word );
 void SearchForWord( SearchableADT<string>*& dictionary, string word, int pos  );
 
+
 int main( int argc, char* argv[] )
 {
-	clock_t start, finish;
-	start = clock();
-	
-	
 	int choice = 0;
+	
 	SearchableADT<string>* dictionary;
-
-	// determine BST or AVL
-	do {
-		switch ( choice = InitMenu() ) {
-			case BST_TREE:
-				dictionary = new BST<string>;
-				break;
-			case AVL_TREE:
-				dictionary = new AVL<string>;
-				break;
-			default:
-			dictionary = new AVL<string>;
-		}
-	} while( choice == 0);
+	GetDS( dictionary );
 	
-	// present menu of choices
-	do {
-		switch ( choice = Menu() ) {
-			case LOAD:
-				ReadFile(  dictionary );
-				break;
-
-			case CLEAR:
-				Clear( dictionary );
-				break;
-
-			case CHECK_ENTRY:
-				CheckEntry(  dictionary );
-				break;
-
-			case CHECK_FROM_FILE:
-				CheckEntryFromFile( dictionary );
-				break;
-
-			case STATS:
-				ShowStats(  dictionary );
-				cout << endl << endl;
-				break;
-		}
-	} while(choice != QUIT);
+		
+	// LUT of function pointers
+	void (*menuTable[7])( SearchableADT<string>*& ) = { 
+			NULL, &ReadFile, &Clear, &CheckEntry, &CheckEntryFromFile, &ShowStats, NULL };
 	
+	do {
+		menuTable[ choice = Menu() ]( dictionary );
+	} while ( choice != 6 );
+
 	
 	delete dictionary;	
-	
-	
-	
-	finish = clock();
-	
-	cout << "time: "
-		 << ((double)(finish - start)/CLOCKS_PER_SEC)
-		 << endl;
 }
 
 
@@ -144,6 +106,23 @@ int Menu()
 	return (choice);
 }
 
+void GetDS( SearchableADT<string>*& dictionary  )
+{
+	int choice = 0;
+	
+	do {
+		switch ( choice = InitMenu() ) {
+			case BST_TREE:
+				dictionary = new BST<string>;
+				break;
+			case AVL_TREE:
+				dictionary = new AVL<string>;
+				break;
+			default:
+			dictionary = new AVL<string>;
+		}
+	} while( choice == 0);	
+}
 
 void ReadFile( SearchableADT<string>*& dictionary )
 {

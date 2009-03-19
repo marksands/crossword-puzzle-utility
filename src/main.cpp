@@ -62,7 +62,6 @@ int main( int argc, char* argv[] )
 		}
 	} while( choice == 0);
 	
-	
 	// present menu of choices
 	do {
 		switch ( choice = Menu() ) {

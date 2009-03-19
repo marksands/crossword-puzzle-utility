@@ -70,6 +70,8 @@ using namespace std;
 			// Performs a preorder copy of the current tree to create a new one.
 		bool isThere(TreeNode<T>* pTree, const T& item);
 			// returns true if the item is found in the tree, false otherwise
+		int treeHeight(TreeNode<T>* pTree);
+			// returns the tree height of the current node
 
 	public:
 		BST();
@@ -89,8 +91,11 @@ using namespace std;
 			// deletes entry 'value'
 		bool isThere(T value);
 			// boolean is there?
-		int numEntries(void);	
+		virtual int numEntries(void);	
 			// number of entries
+			
+		int treeHeight(void);
+			// returns the height of the tree
 	};
 	
 
@@ -223,6 +228,24 @@ using namespace std;
 
 
 
+				template <class T>
+				int BST<T>::treeHeight(TreeNode<T>* pTree)
+				{
+					if ( pTree == NULL ) {
+						return 0;
+					}
+					else {
+						
+						int lheight = treeHeight( pTree->left );
+						int rheight = treeHeight( pTree->right );
+						
+						int height = ( rheight >= lheight ? rheight : lheight );
+						
+						return (height + 1);
+					}
+				}
+
+
 		// *******************************
 		//
 		//		 PUBLIC
@@ -310,7 +333,12 @@ using namespace std;
 				{
 					return ( nodeCount );
 				}
-	
+				
+				template <class T>
+				int BST<T>::treeHeight(void)
+				{
+					return ( treeHeight( root ) );
+				}
 
 //#include "BST.cpp"
 

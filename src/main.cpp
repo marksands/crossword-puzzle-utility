@@ -37,6 +37,7 @@ void Clear( SearchableADT<string>*& dictionary );
 void CheckEntry( SearchableADT<string>*& dictionary );
 void CheckEntryFromFile( SearchableADT<string>*& dictionary );
 void ShowStats( SearchableADT<string>*& dictionary );
+void QuitProgram( SearchableADT<string>*& dictionary );
 
 void SearchForWord( SearchableADT<string>*& dictionary, string word );
 void SearchForWord( SearchableADT<string>*& dictionary, string word, int pos  );
@@ -52,14 +53,13 @@ int main( int argc, char* argv[] )
 		
 	// LUT of function pointers
 	void (*menuTable[7])( SearchableADT<string>*& ) = { 
-			NULL, &ReadFile, &Clear, &CheckEntry, &CheckEntryFromFile, &ShowStats, NULL };
+			NULL, &ReadFile, &Clear, &CheckEntry, &CheckEntryFromFile, &ShowStats, &QuitProgram };
 	
 	do {
 		menuTable[ choice = Menu() ]( dictionary );
 	} while ( choice != 6 );
-
 	
-	delete dictionary;	
+	return 0;
 }
 
 
@@ -195,6 +195,10 @@ void ShowStats( SearchableADT<string>*& dictionary )
 		 << dictionary->treeHeight() << endl;
 }
 
+void QuitProgram( SearchableADT<string>*& dictionary )
+{
+	delete dictionary;
+}
 
 void SearchForWord( SearchableADT<string>*& dictionary, string word )
 {

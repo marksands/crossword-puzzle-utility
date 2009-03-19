@@ -21,8 +21,8 @@
 #include "AVL.h"
 #include "Timer.h"
 
-
 using namespace std;
+
 
 enum MenuOptions {LOAD = 1, CLEAR = 2, CHECK_ENTRY = 3, CHECK_FROM_FILE = 4, STATS = 5, QUIT = 6};
 enum InitMenuOptions { BST_TREE = 1, AVL_TREE =  2};
@@ -43,21 +43,20 @@ void SearchForWord( SearchableADT<string>*& dictionary, string word );
 void SearchForWord( SearchableADT<string>*& dictionary, string word, int pos  );
 
 
+#define DO_COOL_SHIT for(void (*menuTable[7])( SearchableADT<string>*& ) = { NULL, &ReadFile, &Clear, &CheckEntry, &CheckEntryFromFile, &ShowStats, &QuitProgram }; \
+	 					  choice != 6; \
+	 					  menuTable[ choice = Menu() ]( dictionary ) );
+
+
+
 int main( int argc, char* argv[] )
 {
 	int choice = 0;
-	
+
 	SearchableADT<string>* dictionary;
-	GetDS( dictionary );
-	
+	GetDS( dictionary );	
 		
-	// LUT of function pointers
-	void (*menuTable[7])( SearchableADT<string>*& ) = { 
-			NULL, &ReadFile, &Clear, &CheckEntry, &CheckEntryFromFile, &ShowStats, &QuitProgram };
-	
-	do {
-		menuTable[ choice = Menu() ]( dictionary );
-	} while ( choice != 6 );
+	DO_COOL_SHIT;
 	
 	return 0;
 }

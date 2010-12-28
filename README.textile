@@ -1,7 +1,0 @@
-	<h3><strong>340 Crossword Helper</strong></h3>
-
-	<p style="text-align:left;">This is our first 340 programming assignment that is basically a crossword puzzle helper. It stores dictionary files into either a BST or an AVL tree and can perform search queries of words with missing letters through the tree to find a possible matching word.</p>
-
-	<p style="text-align:left;">If the word is not found in the tree, then the word is declared as &#8220;misspelled.&#8221;  A query can be made upon either the existing data structure, or through a given file.</p>
-
-	<p style="text-align:left;">This program is to demonstrate the speed difference between a BST load/search and an AVL load/search.  The BST is significantly slower than the AVL, and the program outputs the amount of time it takes per method.</p>

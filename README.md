@@ -2,6 +2,11 @@
 
 A crossword puzzle utility
 
+## Build & Run
+
+    $ make
+    $ ./dictionary 
+
 ## Usage
 
 Select `1.` from the menu to load a file into the dictionary. Use `/usr/share/dict/words` if you don't have a dictionary file.

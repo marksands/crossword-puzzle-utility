@@ -54,7 +54,7 @@ int main( int argc, char* argv[] )
     std::string filename;
     SearchableADT<std::string>* dictionary = new Hash<std::string>;
 
-    boost::program_options::options_description generic("Options:");
+    boost::program_options::options_description generic("Options");
     generic.add_options()
         ("help,h", "display this help and exit")
         ("file,f", boost::program_options::value<std::string>(&filename)->default_value("/usr/share/dict/words"), "load dictionary file")

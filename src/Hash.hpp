@@ -1,3 +1,32 @@
+/*
+ * Copyright (c) 2010, Mark Sands marksands07@gmail.com
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of Redis nor the names of its contributors may be used
+ *     to endorse or promote products derived from this software without
+ *     specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #ifndef HASH_H
 #define HASH_H
 
@@ -6,8 +35,6 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
-
-using namespace std;
 
   //---------------------------------------------------------------------------------------------------
   // Class: Hash
@@ -34,7 +61,7 @@ using namespace std;
     };  
       
       // vector array of HashNode
-    vector<HashNode> array; 
+    std::vector<HashNode> array; 
             
     virtual int hash(T value) const;
       // finds the hashvalue of the item : 1st hash
@@ -59,7 +86,7 @@ using namespace std;
     virtual ~Hash();
       // Calls DestroyTree() to destroy the current tree.
 
-    virtual int LoadFromFile(string filename);
+    virtual int LoadFromFile(std::string filename);
       // loads from file
     virtual void clear(void);
       // clears tree
@@ -90,7 +117,7 @@ using namespace std;
     template <class T>  
     void Hash<T>::Empty()
     {
-      for ( int i = 0; i < array.size(); i++ )
+      for ( size_t i = 0; i < array.size(); i++ )
         array[i].info = EMPTY;
 
       numberOfItems = 0;
@@ -105,20 +132,20 @@ using namespace std;
     {
       unsigned int hash = 5381;
       
-      for(int i = 0; i < value.length(); i++)
+      for( size_t i = 0; i < value.length(); i++ )
         hash = ((hash << 5) + hash) + value[i];
 
       return hash;
     }
 
 
-      // finds the hashvalue of the item  : 2nd hash  
+      // finds the hashvalue of the item  : 2nd hash
     template <class T>
     int Hash<T>::hash2( T value ) const
     {
       unsigned int hash = 773;
 
-      for( int i = 0; i < value.length(); i++)
+      for( size_t i = 0; i < value.length(); i++ )
         hash = ((hash << 3) + hash) + 1 + value[i];
 
       return hash;
@@ -129,16 +156,16 @@ using namespace std;
     template <class T>
     void Hash<T>::rehash()
     {
-      vector<HashNode> oldArray = array;
+      std::vector<HashNode> oldArray = array;
       
       array.resize( 2 * oldArray.size() + 1 );
-      for ( int i = 0; i < array.size(); i++ ) {
+      for ( size_t i = 0; i < array.size(); i++ ) {
         array[i].info = EMPTY;
       }
       
       size = ( size * 2 ) + 1;
       
-      for ( int i = 0; i < oldArray.size(); i++ ) {
+      for ( size_t i = 0; i < oldArray.size(); i++ ) {
         if ( oldArray[i].info == ACTIVE ) {
           Insert( oldArray[i].element );
         }
@@ -248,10 +275,10 @@ using namespace std;
 
     // loads from file
   template <class T>
-  int Hash<T>::LoadFromFile(string filename)
+  int Hash<T>::LoadFromFile(std::string filename)
   {
     int RET = 1;
-    ifstream fin( filename.c_str() );
+    std::ifstream fin( filename.c_str() );
     T item;
 
     if ( fin.fail() ) {

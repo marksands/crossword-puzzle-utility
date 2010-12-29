@@ -192,7 +192,7 @@ size_t CalculateShrinkability( SearchableADT<std::string>*& dictionary, std::str
   try {
     std::string temp = word.substr( 0, length );
     if ( dictionary->isThere( temp ) ) {
-      std::cout << std::setw(3) << " " << "\"" << word << "\"" << " => \"" << temp << "\"\n";
+      std::cout << std::setw(3) << " " << "\"" << word << "\" => \"" << temp << "\"\n";
       return CalculateShrinkability( dictionary, temp, temp.length() - 1 );
     }
   } catch( std::out_of_range &e ) {
@@ -202,7 +202,7 @@ size_t CalculateShrinkability( SearchableADT<std::string>*& dictionary, std::str
   try {
     std::string temp = word.substr( 1, length );
     if ( dictionary->isThere( temp ) ) {
-      std::cout << std::setw(3) << " " << "\"" << word << "\"" << " => \"" << temp << "\"\n";
+      std::cout << std::setw(3) << " " << "\"" << word << "\" => \"" << temp << "\"\n";
       return CalculateShrinkability( dictionary, temp, temp.length() - 1 );
     }
   } catch( std::out_of_range &e ) {

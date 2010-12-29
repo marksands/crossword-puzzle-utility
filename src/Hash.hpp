@@ -98,9 +98,6 @@
       // boolean is there?
     virtual int numEntries(void); 
       // number of entries
-      
-    virtual int treeHeight(void);
-      // returns the height of the tree; Doesn't apply to this.
   };
 
 #pragma mark -
@@ -342,13 +339,6 @@
   int Hash<T>::numEntries(void)
   {
     return ( numberOfItems );
-  }
-
-    // returns 0, since this isn't a tree..
-  template <class T>
-  int Hash<T>::treeHeight(void)
-  {
-    return -1;
   }
 
 #endif

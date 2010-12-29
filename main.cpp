@@ -28,16 +28,16 @@
  */
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <iomanip>
 #include <stdexcept>
+#include <ctime>
+#include <string>
+#include <vector>
 
 #include <boost/program_options.hpp>
 
 #include "src/SearchableADT.hpp"
 #include "src/Hash.hpp"
-#include "src/Timer.hpp"
 
 void ReadFile( SearchableADT<std::string>*& dictionary, std::string filename );
 void Clear( SearchableADT<std::string>*& dictionary );
@@ -51,6 +51,8 @@ size_t CalculateShrinkability( SearchableADT<std::string>*& dictionary, std::str
 int main( int argc, char* argv[] )
 {
   try {
+    clock_t start, finish;
+    bool debug = false;
     std::string filename;
     SearchableADT<std::string>* dictionary = new Hash<std::string>;
 
@@ -60,10 +62,11 @@ int main( int argc, char* argv[] )
         ("file,f", boost::program_options::value<std::string>(&filename)->default_value("/usr/share/dict/words"), "load dictionary file")
         ("spellcheck,s", boost::program_options::value<std::vector<std::string> >(), "search for PATTERN in dictionary")
         ("reduce,r", boost::program_options::value<std::vector<std::string> >(), "display reducable words for PATTERN")
+        ("debug,d", "enable debugging")
         ("version,v", "print version information and exit")
     ;
 
-    boost::program_options::options_description visible("Allowed options");
+    boost::program_options::options_description visible("");
     visible.add(generic);
 
     boost::program_options::options_description cmdline_options;
@@ -77,7 +80,8 @@ int main( int argc, char* argv[] )
       options(cmdline_options).positional(p).run(), vm);
     notify(vm);
 
-    if (vm.count("help")) {
+    if (vm.count("help") || argc <= 1) {
+      std::cout << "Usage: dictionary [options]\n";
       std::cout << visible << "\n";
       return 0;
     }
@@ -90,23 +94,35 @@ int main( int argc, char* argv[] )
         return 0;
     }
 
+    if (vm.count("debug")) {
+      debug = true;
+    }
+
+    if (debug)
+      start = clock();
+
     if (vm.count("file")) {
       ReadFile( dictionary, filename );
     }
 
     if (vm.count("spellcheck")) {
-      std::string temp;
-      const std::vector<std::string> &s = vm["spellcheck"].as<std::vector<std::string> >();
-      std::copy(s.begin(), s.end(), std::ostream_iterator<std::string>(cout, " "));
-      //CheckSpelling( dictionary, s );
+      const std::string &temp = vm["spellcheck"].as<std::vector<std::string> >()[0];
+      CheckSpelling( dictionary, temp );
     }
 
     if (vm.count("reduce")) {
-      std::string temp;
-      const std::vector<std::string> &s = vm["reduce"].as<std::vector<std::string> >();
-      std::copy(s.begin(), s.end(), std::ostream_iterator<std::string>(cout, " "));
-      //CheckReduce( dictionary, temp );
+      const std::string &temp = vm["reduce"].as<std::vector<std::string> >()[0];
+      CheckReduce( dictionary, temp );
     }
+
+    if (debug) {
+      finish = clock();
+      std::cout << std::setw(5) << " "
+        << "Total time: "
+        << ((double)(finish - start)/CLOCKS_PER_SEC)
+        << "\n";
+    }
+
   }
   catch( std::exception& e )
   {
@@ -124,16 +140,12 @@ void ReadFile( SearchableADT<std::string>*& dictionary, std::string filename )
 
 void Clear( SearchableADT<std::string>*& dictionary )
 {
-  Timer t;
-
   dictionary->clear();
   std::cout << std::setw(3) << " " << "Dictionary cleared." << "\n";
 }
 
 void CheckSpelling( SearchableADT<std::string>*& dictionary, std::string pattern )
 {
-  Timer t;
-
   std::cout << "\n"
      << std::setw(3)  << " "
      << "Words found:" << "\n";
@@ -145,8 +157,6 @@ void CheckSpelling( SearchableADT<std::string>*& dictionary, std::string pattern
 
 void CheckReduce( SearchableADT<std::string>*& dictionary, std::string pattern )
 {
-  Timer t;
-
   std::cout << "\n";
   std::cout << "\n"
       << std::setw(3) << " "
@@ -178,7 +188,7 @@ void SearchForWord( SearchableADT<std::string>*& dictionary, std::string word, i
         SearchForWord( dictionary, temp, qpos );
 
         if ( dictionary->isThere( temp ) ) {
-          std::cout << setw(5) << " " << temp << "\n";
+          std::cout << std::setw(5) << " " << temp << "\n";
         }
       }
     }
@@ -207,6 +217,6 @@ size_t CalculateShrinkability( SearchableADT<std::string>*& dictionary, std::str
     return word.length();
   }
 
-  std::cout << setw(3) << " " << "\"" << word << "\"\n";
+  std::cout << std::setw(3) << " " << "\"" << word << "\"\n";
   return word.length();
 }

@@ -4,49 +4,46 @@ A crossword puzzle utility
 
 ## Build & Run
 
+You must have boost installed and your $BOOST_ROOT env set.
+
     $ make
-    $ ./dictionary 
 
 ## Usage
 
-Select `1.` from the menu to load a file into the dictionary. Use `/usr/share/dict/words` if you don't have a dictionary file.
+    Usage: dictionary [options]
 
-    1. Load file
-    2. Check spelling
-    3. Check shrinkability
-    4. Clear data
-    5. Quit
-
-     Enter choice: 1
-
-     Enter filename: /usr/share/dict/words
-       Total time: 0.92069
+    Options:
+      -h [ --help ]                         display this help and exit
+      -f [ --file ] arg (=/usr/share/dict/words)
+                                            load dictionary file
+      -s [ --spellcheck ] arg               search for PATTERN in dictionary
+      -r [ --reduce ] arg                   display reducable words for PATTERN
+      -d [ --debug ]                        enable debugging
+      -v [ --version ]                      print version information and exit
 
 ## Spellchecker
 
-Select `2.` from the menu to enter spellcheck mode. This works great for crossword puzzles. Just enter a pattern, using `?` as the wildcard, and the dictionary will search for all matches.
+Use the `-s PATTERN` or `--spellcheck=PATTERN` option to spellcheck a given word. This works great for crossword puzzles. Just enter a pattern, using `?` as the wildcard, and the dictionary will search for all matches.
 
-    Enter a word or pattern. Use '?' for wilcard: ?ron
+    $ dictionary --spellcheck="han?y"
 
-    Words found:
-      iron
-      tron
+       Words found:
+         handy
+         hanky
 
-      Total time: 0.00029
+## Reduce
 
-## Shrinkability
+Use the `-r PATTERN` or `--reduce=PATTERN` option to check a words shrinkability. The shrinkability of a word shows of the smallest word that can be created by stripping off one letter at a time from either the front or back of a word, with each intermediary word being another valid English word or entry from the dictionary.
 
-Select `3.` from the menu to enter shrinkability mode. The shrinkability of a word shows of the smallest word that can be created by stripping off one letter at a time from either the front or back of a word, with each intermediary word being another valid English word or entry from the dictionary.
+    $ dictionary --reduce "handy"
 
-    Enter a word to check its shrinkability index: revolver
+       "handy" => "hand"
+       "hand" => "han"
+       "han" => "ha"
+       "ha" => "h"
+       "h"
 
-    "revolver" => "revolve"
-    "revolve" => "evolve"
-    "evolve"
-
-    Shrinkability index: 6
-
-     Total time: 0.000252
+       Shrinkability index: 1
 
 # License
 

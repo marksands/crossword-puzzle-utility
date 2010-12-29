@@ -56,11 +56,11 @@ int main( int argc, char* argv[] )
 
     boost::program_options::options_description generic("Options:");
     generic.add_options()
-        ("h,help", "display this help and exit")
-        ("f,file", boost::program_options::value<std::string>(&filename)->default_value("/usr/share/dict/words"), "load dictionary file")
-        ("s,spellcheck", boost::program_options::value<std::vector<std::string> >(), "search for PATTERN in dictionary")
-        ("r,reduce", boost::program_options::value<std::vector<std::string> >(), "display reducable words for PATTERN")
-        ("v,version", "print version information and exit")
+        ("help,h", "display this help and exit")
+        ("file,f", boost::program_options::value<std::string>(&filename)->default_value("/usr/share/dict/words"), "load dictionary file")
+        ("spellcheck,s", boost::program_options::value<std::vector<std::string> >(), "search for PATTERN in dictionary")
+        ("reduce,r", boost::program_options::value<std::vector<std::string> >(), "display reducable words for PATTERN")
+        ("version,v", "print version information and exit")
     ;
 
     boost::program_options::options_description visible("Allowed options");
@@ -82,6 +82,14 @@ int main( int argc, char* argv[] )
       return 0;
     }
 
+    if (vm.count("version")) {
+        std::cout << "dictionary 1.0.0\n\n"
+          << "Copyright 2010 Mark Sands.\n"
+          << "This is free software; see the source for copying conditions. There is NO\n"
+          << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n";
+        return 0;
+    }
+
     if (vm.count("file")) {
       ReadFile( dictionary, filename );
     }
@@ -99,14 +107,6 @@ int main( int argc, char* argv[] )
       std::copy(s.begin(), s.end(), std::ostream_iterator<std::string>(cout, " "));
       //CheckReduce( dictionary, temp );
     }
-
-    if (vm.count("version")) {
-        std::cout << "dictionary 1.0.0\n\n"
-          << "Copyright 2010 Mark Sands.\n"
-          << "This is free software; see the source for copying conditions. There is NO\n"
-          << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n";
-        return 0;
-    }
   }
   catch( std::exception& e )
   {
@@ -118,8 +118,6 @@ int main( int argc, char* argv[] )
 
 void ReadFile( SearchableADT<std::string>*& dictionary, std::string filename )
 {
-  Timer t;
-
   if ( !dictionary->LoadFromFile(filename) )
     std::cerr << std::setw(3) << " " << "File failed to load!" << "\n";
 }
